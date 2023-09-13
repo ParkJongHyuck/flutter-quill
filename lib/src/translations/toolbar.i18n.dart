@@ -669,7 +669,7 @@ extension Localization on String {
           'Camera': '카메라',
           'Video': '비디오',
           'Undo': 'Undo',
-          'Redo': 'Redo',
+          'Redo': '되돌리기',
           'Font family': 'Font family',
           'Font size': 'Font size',
           'Bold': 'Bold',
