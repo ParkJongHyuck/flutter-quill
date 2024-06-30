@@ -1,110 +1,51 @@
 library flutter_quill_extensions;
 
-import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart';
+// ignore: implementation_imports
+import 'package:flutter_quill/src/services/clipboard/clipboard_service_provider.dart';
+import 'package:meta/meta.dart' show immutable;
 
-import 'embeds/builders.dart';
-import 'embeds/embed_types.dart';
-import 'embeds/toolbar/camera_button.dart';
-import 'embeds/toolbar/formula_button.dart';
-import 'embeds/toolbar/image_button.dart';
-import 'embeds/toolbar/video_button.dart';
+import 'services/clipboard/super_clipboard_service.dart';
 
 export 'embeds/embed_types.dart';
-export 'embeds/toolbar/camera_button.dart';
-export 'embeds/toolbar/formula_button.dart';
-export 'embeds/toolbar/image_button.dart';
-export 'embeds/toolbar/image_video_utils.dart';
-export 'embeds/toolbar/media_button.dart';
-export 'embeds/toolbar/video_button.dart';
-export 'embeds/utils.dart';
+export 'embeds/formula/toolbar/formula_button.dart';
+export 'embeds/image/editor/image_embed.dart';
+export 'embeds/image/editor/image_embed_types.dart';
+export 'embeds/image/editor/image_web_embed.dart';
+export 'embeds/image/toolbar/image_button.dart';
+export 'embeds/others/camera_button/camera_button.dart';
+export 'embeds/others/media_button/media_button.dart';
+export 'embeds/table/editor/table_cell_embed.dart';
+export 'embeds/table/editor/table_embed.dart';
+export 'embeds/table/editor/table_models.dart';
+export 'embeds/table/toolbar/table_button.dart';
+export 'embeds/unknown/editor/unknown_embed.dart';
+export 'embeds/video/editor/video_embed.dart';
+export 'embeds/video/editor/video_web_embed.dart';
+export 'embeds/video/toolbar/video_button.dart';
+export 'embeds/video/video.dart';
+export 'extensions/controller_ext.dart';
+export 'flutter_quill_embeds.dart';
+export 'models/config/camera/camera_configurations.dart';
+export 'models/config/formula/formula_configurations.dart';
+export 'models/config/image/editor/image_configurations.dart';
+export 'models/config/image/editor/image_web_configurations.dart';
+export 'models/config/image/toolbar/image_configurations.dart';
+export 'models/config/media/media_button_configurations.dart';
+export 'models/config/shared_configurations.dart';
+export 'models/config/table/table_configurations.dart';
+export 'models/config/video/editor/video_configurations.dart';
+export 'models/config/video/editor/video_web_configurations.dart';
+export 'models/config/video/toolbar/video_configurations.dart';
+export 'utils/utils.dart';
 
-class FlutterQuillEmbeds {
-  static List<EmbedBuilder> builders({
-    void Function(GlobalKey videoContainerKey)? onVideoInit,
-  }) =>
-      [
-        ImageEmbedBuilder(),
-        VideoEmbedBuilder(onVideoInit: onVideoInit),
-        FormulaEmbedBuilder(),
-      ];
+@immutable
+class FlutterQuillExtensions {
+  const FlutterQuillExtensions._();
 
-  static List<EmbedBuilder> webBuilders() => [
-        ImageEmbedBuilderWeb(),
-      ];
-
-  static List<EmbedButtonBuilder> buttons({
-    bool showImageButton = true,
-    bool showVideoButton = true,
-    bool showCameraButton = true,
-    bool showFormulaButton = false,
-    String? imageButtonTooltip,
-    String? videoButtonTooltip,
-    String? cameraButtonTooltip,
-    String? formulaButtonTooltip,
-    OnImagePickCallback? onImagePickCallback,
-    OnVideoPickCallback? onVideoPickCallback,
-    MediaPickSettingSelector? mediaPickSettingSelector,
-    MediaPickSettingSelector? cameraPickSettingSelector,
-    FilePickImpl? filePickImpl,
-    WebImagePickImpl? webImagePickImpl,
-    WebVideoPickImpl? webVideoPickImpl,
-    RegExp? imageLinkRegExp,
-    RegExp? videoLinkRegExp,
-  }) =>
-      [
-        if (showImageButton)
-          (controller, toolbarIconSize, iconTheme, dialogTheme) => ImageButton(
-                icon: Icons.image,
-                iconSize: toolbarIconSize,
-                tooltip: imageButtonTooltip,
-                controller: controller,
-                onImagePickCallback: onImagePickCallback,
-                filePickImpl: filePickImpl,
-                webImagePickImpl: webImagePickImpl,
-                mediaPickSettingSelector: mediaPickSettingSelector,
-                iconTheme: iconTheme,
-                dialogTheme: dialogTheme,
-                linkRegExp: imageLinkRegExp,
-              ),
-        if (showVideoButton)
-          (controller, toolbarIconSize, iconTheme, dialogTheme) => VideoButton(
-                icon: Icons.movie_creation,
-                iconSize: toolbarIconSize,
-                tooltip: videoButtonTooltip,
-                controller: controller,
-                onVideoPickCallback: onVideoPickCallback,
-                filePickImpl: filePickImpl,
-                webVideoPickImpl: webImagePickImpl,
-                mediaPickSettingSelector: mediaPickSettingSelector,
-                iconTheme: iconTheme,
-                dialogTheme: dialogTheme,
-                linkRegExp: videoLinkRegExp,
-          ),
-        if ((onImagePickCallback != null || onVideoPickCallback != null) &&
-            showCameraButton)
-          (controller, toolbarIconSize, iconTheme, dialogTheme) => CameraButton(
-                icon: Icons.photo_camera,
-                iconSize: toolbarIconSize,
-                tooltip: cameraButtonTooltip,
-                controller: controller,
-                onImagePickCallback: onImagePickCallback,
-                onVideoPickCallback: onVideoPickCallback,
-                filePickImpl: filePickImpl,
-                webImagePickImpl: webImagePickImpl,
-                webVideoPickImpl: webVideoPickImpl,
-                cameraPickSettingSelector: cameraPickSettingSelector,
-                iconTheme: iconTheme,
-              ),
-        if (showFormulaButton)
-          (controller, toolbarIconSize, iconTheme, dialogTheme) =>
-              FormulaButton(
-                icon: Icons.functions,
-                iconSize: toolbarIconSize,
-                tooltip: formulaButtonTooltip,
-                controller: controller,
-                iconTheme: iconTheme,
-                dialogTheme: dialogTheme,
-              )
-      ];
+  /// Override default implementation of [ClipboardServiceProvider.instacne]
+  /// to allow `flutter_quill` package to use `super_clipboard` plugin
+  /// to support rich text features, gif and images.
+  static void useSuperClipboardPlugin() {
+    ClipboardServiceProvider.setInstance(SuperClipboardService());
+  }
 }

@@ -1,10 +1,15 @@
 import 'dart:collection';
 
-import '../../../widgets/embeds.dart';
+import '../../../widgets/quill/embeds.dart';
 import '../style.dart';
 import 'leaf.dart';
 import 'line.dart';
 import 'node.dart';
+
+@Deprecated('Please use QuillContainer instead')
+
+/// For backward compatibility
+abstract base class Container<T extends Node?> extends QuillContainer<T> {}
 
 /// Container can accommodate other nodes.
 ///
@@ -12,8 +17,9 @@ import 'node.dart';
 /// operation container looks for a child at specified index position and
 /// forwards operation to that child.
 ///
-/// Most of the operation handling logic is implemented by [Line] and [Text].
-abstract class Container<T extends Node?> extends Node {
+/// Most of the operation handling logic is implemented by [Line]
+/// and [QuillText].
+abstract base class QuillContainer<T extends Node?> extends Node {
   final LinkedList<Node> _children = LinkedList<Node>();
 
   /// List of children.
@@ -63,7 +69,7 @@ abstract class Container<T extends Node?> extends Node {
   }
 
   /// Moves children of this node to [newParent].
-  void moveChildToNewParent(Container? newParent) {
+  void moveChildToNewParent(QuillContainer? newParent) {
     if (isEmpty) {
       return;
     }
@@ -136,24 +142,24 @@ abstract class Container<T extends Node?> extends Node {
   }
 
   @override
-  void retain(int index, int? length, Style? attributes) {
+  void retain(int index, int? len, Style? style) {
     assert(isNotEmpty);
     final child = queryChild(index, false);
-    child.node!.retain(child.offset, length, attributes);
+    child.node!.retain(child.offset, len, style);
   }
 
   @override
-  void delete(int index, int? length) {
+  void delete(int index, int? len) {
     assert(isNotEmpty);
     final child = queryChild(index, false);
-    child.node!.delete(child.offset, length);
+    child.node!.delete(child.offset, len);
   }
 
   @override
   String toString() => _children.join('\n');
 }
 
-/// Result of a child query in a [Container].
+/// Result of a child query in a [QuillContainer].
 class ChildQuery {
   ChildQuery(this.node, this.offset);
 
@@ -162,7 +168,7 @@ class ChildQuery {
 
   /// Starting offset within the child [node] which points at the same
   /// character in the document as the original offset passed to
-  /// [Container.queryChild] method.
+  /// [QuillContainer.queryChild] method.
   final int offset;
 
   /// Returns `true` if there is no child node found, e.g. [node] is `null`.

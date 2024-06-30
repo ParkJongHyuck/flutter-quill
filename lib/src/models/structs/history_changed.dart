@@ -1,3 +1,6 @@
+import 'package:meta/meta.dart' show immutable;
+
+@immutable
 class HistoryChanged {
   const HistoryChanged(
     this.changed,
@@ -5,5 +8,5 @@ class HistoryChanged {
   );
 
   final bool changed;
-  final int? len;
+  final int len;
 }

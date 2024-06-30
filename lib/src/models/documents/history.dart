@@ -1,4 +1,4 @@
-import '../quill_delta.dart';
+import '../../../quill_delta.dart';
 import '../structs/doc_change.dart';
 import '../structs/history_changed.dart';
 import 'document.dart';
@@ -12,7 +12,7 @@ class History {
     this.lastRecorded = 0,
   });
 
-  final HistoryStack stack = HistoryStack.empty();
+  HistoryStack stack = HistoryStack.empty();
 
   bool get hasUndo => stack.undo.isNotEmpty;
 
@@ -34,7 +34,7 @@ class History {
 
   void handleDocChange(DocChange docChange) {
     if (ignoreChange) return;
-    if (!userOnly || docChange.source == ChangeSource.LOCAL) {
+    if (!userOnly || docChange.source == ChangeSource.local) {
       record(docChange.change, docChange.before);
     } else {
       transform(docChange.change);
@@ -91,13 +91,12 @@ class History {
     }
     final delta = source.removeLast();
     // look for insert or delete
-    int? len = 0;
+    var len = 0;
     final ops = delta.toList();
     for (var i = 0; i < ops.length; i++) {
-      if (ops[i].key == Operation.insertKey) {
-        len = ops[i].length;
-      } else if (ops[i].key == Operation.deleteKey) {
-        len = ops[i].length! * -1;
+      if ((ops[i].key == Operation.insertKey) ||
+          (ops[i].key == Operation.retainKey)) {
+        len += ops[i].length ?? 0;
       }
     }
     final base = Delta.from(doc.toDelta());
@@ -105,7 +104,7 @@ class History {
     dest.add(inverseDelta);
     lastRecorded = 0;
     ignoreChange = true;
-    doc.compose(delta, ChangeSource.LOCAL);
+    doc.compose(delta, ChangeSource.local);
     ignoreChange = false;
     return HistoryChanged(true, len);
   }
@@ -124,8 +123,8 @@ class HistoryStack {
       : undo = [],
         redo = [];
 
-  final List<Delta> undo;
-  final List<Delta> redo;
+  List<Delta> undo;
+  List<Delta> redo;
 
   void clear() {
     undo.clear();
